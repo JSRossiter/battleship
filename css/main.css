@@ -13,7 +13,7 @@ td.x {
 td.o {
   background: white;
 }
-td.c, td.b, td.r, td.s, td.d {
+td.c.human, td.b.human, td.r.human, td.s.human, td.d.human {
   background: black;
 }
 h1, h2 {

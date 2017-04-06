@@ -40,3 +40,20 @@ function input (prompt, callback) {
     process.exit();
   })
 }
+
+
+
+function input (prompt) {
+  var stdin = process.stdin, stdout = process.stdout;
+  stdin.resume();
+  stdout.write(prompt);
+  stdin.once('data', function (data) {
+    return data;
+    // process.exit();
+  })
+}
+
+var test = input("test", placeShip);
+console.log(test);
+
+
