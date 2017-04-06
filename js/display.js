@@ -29,10 +29,10 @@ DOMdisplay.prototype.drawBoard = function (board, player) {
 }
 
 function onClick (target) {
-  // doStuff
   var coords = [];
-  coords[0] = target.which.getAttribute("data-row");
-  coords[1] = target.which.getAttribute("data-col");
+  console.log(target);
+  // coords[0] = target.which.getAttribute("data-row");
+  // coords[1] = target.which.getAttribute("data-col");
   return coords;
 }
 
@@ -52,9 +52,13 @@ var testBoard = [
   ];
 
 window.onload = function() {
+  setBoard();
   var compBoard = new DOMdisplay(document.getElementById("compBoard"), boards.computer, "computer");
   var humanBoard = new DOMdisplay(document.getElementById("humanBoard"), boards.human, "human");
   var cells = document.querySelectorAll(".computer.cell")
-  cells.addEventListener("click", onClick(event));
+  console.log(boards);
+  // cells.forEach(function(cell) {
+  //   cell.addEventListener("click", onClick(event));
+  // })
 }
 

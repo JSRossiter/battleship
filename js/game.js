@@ -173,58 +173,7 @@ function aiTarget () {
 
 // human targeting
 function humanTarget () {
-  // test if targeting is boxed in
-  if (targeting) {
-    var row = previousHit[0];
-    var col = previousHit[1];
-    if (!(
-    testFire(row + 1, col, "computer") ||
-    testFire(row - 1, col, "computer") ||
-    testFire(row, col + 1, "computer") ||
-    testFire(row, col - 1, "computer"))) {
-      targeting = false;
-    }
-  }
-  // randomly select cell adjacent to previousHit
-  if (targeting) {
-    var position = Math.floor(Math.random()*4);
-    if (position === 0) {
-      var row = previousHit[0] + 1;
-      var col = previousHit[1];
-    } else if (position === 1) {
-      var row = previousHit[0] - 1;
-      var col = previousHit[1];
-    } else if (position === 2) {
-      var row = previousHit[0];
-      var col = previousHit[1] + 1;
-    } else if (position === 3) {
-      var row = previousHit[0];
-      var col = previousHit[1] - 1;
-    }
-    // fire and return results
-    var result = fire(row, col, "computer");
-    if (result === undefined) return humanTarget();
-    if (result === "hit") {
-      targeting = true;
-      previousHit = [row, col];
-    } else if (result === "miss") {
-      targeting = true;
-    } else {
-    targeting = false;
-    }
-    return result;
-  } else {
-    //targeting = false
-    var row = random();
-    var col = random();
-    var result = fire(row, col, "computer");
-    if (result === undefined) return humanTarget();
-    if (result === "hit") {
-      targeting = true;
-      previousHit = [row, col];
-    }
-    return result;
-  }
+
 }
 
 function testFire (row, col, player) {
@@ -258,8 +207,9 @@ function hit (player, ship) {
 }
 
 // run turn - win condition?
-function runTurn () {
+function runTurn (row, col) {
   // player inputs shot, update display, print result, computer shot, update display, print result
+  fire(row, col, "computer")
   console.log(turns++);
   console.log(boards.human);
   var result = humanTarget();
@@ -274,7 +224,6 @@ function runGame () {
   // set ship count
   // setBoard etc
   // DOMdisplay(document.body, "human");
-  setBoard();
   gameOver(runTurn());
 }
 
@@ -283,6 +232,7 @@ function gameOver (winner) {
   console.log(boards);
 }
 
+setBoard();
 
 var previousHit = [];
 var targeting = false;
