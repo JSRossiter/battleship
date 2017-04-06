@@ -1,0 +1,21 @@
+table {
+  background: lightblue;
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+td {
+  border: 1px solid black;
+}
+td.x {
+  background: red;
+}
+td.o {
+  background: white;
+}
+td.c, td.b, td.r, td.s, td.d {
+  background: black;
+}
+h1, h2 {
+  text-align: center;
+}
