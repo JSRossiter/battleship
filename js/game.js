@@ -197,6 +197,8 @@ function aiTarget () {
   }
 }
 
+// aiTarget alternative - any hit pushes valid surrounding cells to targetList[]
+
 // human targeting
 function humanTarget () {
 
@@ -209,7 +211,6 @@ function testFire (row, col, player) {
 
 // take shot with coords and
 function fire (row, col, player) {
-  console.log(row, col);
   if (row > 9 || row < 0 || col > 9 || col < 0 || boards[player][row][col] === 'x' || boards[player][row][col] === 'o') return;
   if (boards[player][row][col] === ' ') {
     boards[player][row][col] = 'o';
@@ -217,7 +218,9 @@ function fire (row, col, player) {
   } else {
     var status = hit(player, boards[player][row][col]);
     boards[player][row][col] = 'x'
+    console.log(status);
     return status;
+
   }
 }
 
@@ -225,8 +228,8 @@ function fire (row, col, player) {
 function hit (player, ship) {
   // update ship status, return ship type if sunk, players loses if game over
   ships[player][ship]--
-  console.log(ship, "hit, remaining squares:", ships[player][ship])
-  console.log("total remaining squares:", ships[player].total())
+  console.log(player, ship, "hit, remaining squares:", ships[player][ship])
+  console.log(player, "total remaining squares:", ships[player].total())
   if (ships[player].total() === 0) return player + " loses";
   if (ships[player][ship] === 0) return ship;
   return "hit"
@@ -235,13 +238,12 @@ function hit (player, ship) {
 // run turn - win condition?
 function runTurn (row, col) {
   // player inputs shot, update display, print result, computer shot, update display, print result
-  // var result = fire(row, col, "computer")
+  var result = fire(row, col, "computer")
   console.log(turns++);
-  console.log(boards.human);
+  // console.log(boards.human);
   if (result === "computer loses") return result;
   var result = aiTarget();
   if (result === "human loses") return result;
-  return runTurn();
 }
 
 // run game
@@ -259,12 +261,8 @@ function gameOver (winner) {
 
 setBoard();
 var previousHits = [];
-
-// var previousHit = [];
-// var targeting = false;
 var turns = 0;
-runGame();
-
+// runGame();
 
 
 

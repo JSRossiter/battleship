@@ -18,7 +18,7 @@ DOMdisplay.prototype.drawBoard = function (board, player) {
     var rowElt = table.appendChild(elt("tr"));
     rowElt.style.height = scale + "px";
     row.forEach(function(type, colIdx) {
-      var cell = elt("td", type + player + " cell")
+      var cell = elt("td", type + " " + player + " cell")
       cell.setAttribute("data-row", rowIdx);
       cell.setAttribute("data-col", colIdx);
       rowElt.appendChild(cell);
@@ -27,38 +27,22 @@ DOMdisplay.prototype.drawBoard = function (board, player) {
   return table;
 }
 
-function onClick (target) {
-  var coords = [];
-  // coords[0] = target.currentTarget.getAttribute("data-row");
-  coords[1] = target.currentTarget;
-  console.log(target.currentTarget);
-  return coords;
+function aim (target) {
+  var row = target.currentTarget.getAttribute("data-row");
+  var col = target.currentTarget.getAttribute("data-col");
+  runTurn(row, col);
 }
-
-
-
-var testBoard = [
-  [" ", "c", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", "c", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", "c", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", "x", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", "o", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
-  ];
 
 var scale = 30;
 
 window.onload = function() {
-  setBoard();
   var compBoard = new DOMdisplay(document.getElementById("compBoard"), boards.computer, "computer");
   var humanBoard = new DOMdisplay(document.getElementById("humanBoard"), boards.human, "human");
-  var cells = document.querySelectorAll(".computer.cell")
-  cells.forEach(function(cell) {
-    cell.addEventListener("click", onClick(event));
-  })
+  var cells = document.getElementsByTagName("td")
+  console.log(typeof cells);
+  console.log(cells[10]);
+  for (var i = 0; i < 100; i++) {
+    cells[i].addEventListener("click", aim);
+  }
 }
 
