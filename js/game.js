@@ -93,7 +93,7 @@ function setBoard () {
     var check = placeShip(random(), random(), "computer", 'd', Math.random() < 0.5 ? "vertical" : "horizontal");
   } while (!check);
 
-  // test code
+  // temporary code to place human ships
   do {
     var check = placeShip(random(), random(), "human", 'c', Math.random() < 0.5 ? "vertical" : "horizontal");
   } while (!check);
@@ -115,57 +115,83 @@ function random () {
   return Math.floor(Math.random()*10);
 }
 
-// AI targeting
 function aiTarget () {
-  // test if targeting is boxed in
-  if (targeting) {
-    var row = previousHit[0];
-    var col = previousHit[1];
+  if (previousHits.length === 1) {
+    // check for valid adjacent cell
+    var row = previousHits[0][0];
+    var col = previousHits[0][1];
     if (!(
     testFire(row + 1, col, "human") ||
     testFire(row - 1, col, "human") ||
     testFire(row, col + 1, "human") ||
     testFire(row, col - 1, "human"))) {
-      targeting = false;
+      previousHits = [];
+      return aiTarget();
     }
-  }
-  // randomly select cell adjacent to previousHit
-  if (targeting) {
-    var position = Math.floor(Math.random()*4);
-    if (position === 0) {
-      var row = previousHit[0] + 1;
-      var col = previousHit[1];
-    } else if (position === 1) {
-      var row = previousHit[0] - 1;
-      var col = previousHit[1];
-    } else if (position === 2) {
-      var row = previousHit[0];
-      var col = previousHit[1] + 1;
-    } else if (position === 3) {
-      var row = previousHit[0];
-      var col = previousHit[1] - 1;
+    // choose adjacent cell
+    var direction = Math.floor(Math.random()*4);
+    if (direction === 0) {
+      var row = previousHits[0][0] + 1;
+      var col = previousHits[0][1];
+    } else if (direction === 1) {
+      var row = previousHits[0][0] - 1;
+      var col = previousHits[0][1];
+    } else if (direction === 2) {
+      var row = previousHits[0][0];
+      var col = previousHits[0][1] + 1;
+    } else if (direction === 3) {
+      var row = previousHits[0][0];
+      var col = previousHits[0][1] - 1;
     }
     // fire and return results
     var result = fire(row, col, "human");
     if (result === undefined) return aiTarget();
     if (result === "hit") {
-      targeting = true;
-      previousHit = [row, col];
-    } else if (result === "miss") {
-      targeting = true;
-    } else {
-    targeting = false;
+      previousHits.push([row, col]);
+    } else if (result !== "miss") {
+      previousHits = [];
     }
     return result;
+
+  } else if (previousHits.length > 1) {
+    // continue firing in same direction, if possible
+    var prev = previousHits.length - 1;
+    var row = previousHits[prev][0] + previousHits[prev][0] - previousHits[prev - 1][0];
+    var col = previousHits[prev][1] + previousHits[prev][1] - previousHits[prev - 1][1];
+    if (testFire(row, col, "human")) {
+      var result = fire(row, col, "human");
+      if (result === "hit") {
+        previousHits.push([row, col]);
+      } else if (result !== "miss") {
+        previousHits = [];
+      }
+      return result;
+
+    } else {
+      // attempt firing in other direction
+      row = previousHits[0][0] + previousHits[0][0] - previousHits[1][0];
+      row = previousHits[0][1] + previousHits[0][1] - previousHits[1][1];
+      if (testFire(row, col, "human")) {
+        var result = fire(row, col, "human");
+        if (result === "hit") {
+          previousHits.push([row, col]);
+        } else if (result !== "miss") {
+          previousHits = [];
+        }
+        return result;
+      } else {
+        previousHits = [];
+        return aiTarget();
+      }
+    }
   } else {
-    //targeting = false
+    // random firing
     var row = random();
     var col = random();
     var result = fire(row, col, "human");
     if (result === undefined) return aiTarget();
     if (result === "hit") {
-      targeting = true;
-      previousHit = [row, col];
+      previousHits.push([row, col]);
     }
     return result;
   }
@@ -209,13 +235,12 @@ function hit (player, ship) {
 // run turn - win condition?
 function runTurn (row, col) {
   // player inputs shot, update display, print result, computer shot, update display, print result
-  fire(row, col, "computer")
+  // var result = fire(row, col, "computer")
   console.log(turns++);
   console.log(boards.human);
-  var result = humanTarget();
   if (result === "computer loses") return result;
-  var finalResult = aiTarget();
-  if (finalResult === "human loses") return finalResult;
+  var result = aiTarget();
+  if (result === "human loses") return result;
   return runTurn();
 }
 
@@ -233,11 +258,12 @@ function gameOver (winner) {
 }
 
 setBoard();
+var previousHits = [];
 
-var previousHit = [];
-var targeting = false;
+// var previousHit = [];
+// var targeting = false;
 var turns = 0;
-// runGame();
+runGame();
 
 
 

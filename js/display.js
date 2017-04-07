@@ -10,7 +10,6 @@ function DOMdisplay (parent, board, player) {
 
   this.wrap.appendChild(this.drawBoard(board, player));
 }
-var scale = 30;
 
 DOMdisplay.prototype.drawBoard = function (board, player) {
   var table = elt("table", "board");
@@ -30,9 +29,9 @@ DOMdisplay.prototype.drawBoard = function (board, player) {
 
 function onClick (target) {
   var coords = [];
-  console.log(target);
-  // coords[0] = target.which.getAttribute("data-row");
-  // coords[1] = target.which.getAttribute("data-col");
+  // coords[0] = target.currentTarget.getAttribute("data-row");
+  coords[1] = target.currentTarget;
+  console.log(target.currentTarget);
   return coords;
 }
 
@@ -51,14 +50,15 @@ var testBoard = [
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
   ];
 
+var scale = 30;
+
 window.onload = function() {
   setBoard();
   var compBoard = new DOMdisplay(document.getElementById("compBoard"), boards.computer, "computer");
   var humanBoard = new DOMdisplay(document.getElementById("humanBoard"), boards.human, "human");
   var cells = document.querySelectorAll(".computer.cell")
-  console.log(boards);
-  // cells.forEach(function(cell) {
-  //   cell.addEventListener("click", onClick(event));
-  // })
+  cells.forEach(function(cell) {
+    cell.addEventListener("click", onClick(event));
+  })
 }
 
