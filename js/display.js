@@ -9,6 +9,8 @@ function DOMdisplay (parent, board, player) {
   this.board = board;
 
   this.wrap.appendChild(this.drawBoard(board, player));
+
+  // THERE IS SOME BULLSHIT HAPPENING IN HERE - HUMAN BOARD DRAWS THE COMPUTER BOARD
 }
 
 DOMdisplay.prototype.drawBoard = function (board, player) {
@@ -28,21 +30,43 @@ DOMdisplay.prototype.drawBoard = function (board, player) {
 }
 
 function aim (target) {
-  var row = target.currentTarget.getAttribute("data-row");
-  var col = target.currentTarget.getAttribute("data-col");
-  runTurn(row, col);
+  var row = Number(target.currentTarget.getAttribute("data-row"));
+  var col = Number(target.currentTarget.getAttribute("data-col"));
+  if (testFire(row, col, "computer")) {
+    runTurn(row, col);
+  }
 }
 
-var scale = 30;
-
-window.onload = function() {
-  var compBoard = new DOMdisplay(document.getElementById("compBoard"), boards.computer, "computer");
-  var humanBoard = new DOMdisplay(document.getElementById("humanBoard"), boards.human, "human");
+function addTargeting () {
   var cells = document.getElementsByTagName("td")
-  console.log(typeof cells);
-  console.log(cells[10]);
   for (var i = 0; i < 100; i++) {
     cells[i].addEventListener("click", aim);
   }
 }
 
+var scale = 30;
+
+
+
+window.onload = function() {
+  var compContainer = document.getElementById("compBoard");
+  var humanContainer = document.getElementById("humanBoard");
+  var compBoard = new DOMdisplay(compContainer, boardTemplate, "computer");
+  var humanBoard = new DOMdisplay(humanContainer, boardTemplate, "human");
+  runGame();
+
+}
+
+function updateBoard () {
+  var compContainer = document.getElementById("compBoard");
+  var humanContainer = document.getElementById("humanBoard");
+  compContainer.removeChild(compContainer.childNodes[0]);
+  humanContainer.removeChild(humanContainer.childNodes[0]);
+  var compBoard = new DOMdisplay(document.getElementById("compBoard"), boards.computer, "computer");
+  var humanBoard = new DOMdisplay(document.getElementById("humanBoard"), boards.human, "human");
+}
+
+function logMessage (message) {
+  // push something to text box
+  console.log(message);
+}

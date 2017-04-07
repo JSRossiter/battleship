@@ -2,8 +2,9 @@
 // ships are: 5-C, 4-B, 3-R, 3-S, 2-D
 
 // create boards - coordinates are [row][col] from top left
-var boards = {
-  human: [
+var boards = {};
+
+var boardTemplate = [
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
@@ -14,20 +15,7 @@ var boards = {
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
-  ],
-  computer: [
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
-  ]
-}
+  ];
 
 // used to assign size and track life
 var ships = {
@@ -53,28 +41,6 @@ var ships = {
   }
 }
 
-// place ship
-function placeShip (row, col, player, ship, orientation) {
-  var size = ships[player][ship];
-  // check for valid placement
-  for (var i = 0; i < size; i++) {
-    if (orientation === "vertical") {
-      if (row + size > 9 || boards[player][row + i][col] !== " ") return;
-    }
-    if (orientation === "horizontal") {
-      if (boards[player][row][col + i] !== " ") return;
-    }
-  }
-
-  // update board
-  for (var i = 0; i < size; i++) {
-    boards[player][row][col] = ship;
-    if (orientation === "vertical") row++;
-    if (orientation === "horizontal") col++;
-  }
-  return true;
-}
-
 function setBoard () {
   // computer placement
   do {
@@ -93,115 +59,74 @@ function setBoard () {
     var check = placeShip(random(), random(), "computer", 'd', Math.random() < 0.5 ? "vertical" : "horizontal");
   } while (!check);
 
-  // temporary code to place human ships
-  do {
-    var check = placeShip(random(), random(), "human", 'c', Math.random() < 0.5 ? "vertical" : "horizontal");
-  } while (!check);
-  do {
-    var check = placeShip(random(), random(), "human", 'b', Math.random() < 0.5 ? "vertical" : "horizontal");
-  } while (!check);
-  do {
-    var check = placeShip(random(), random(), "human", 'r', Math.random() < 0.5 ? "vertical" : "horizontal");
-  } while (!check);
-  do {
-    var check = placeShip(random(), random(), "human", 's', Math.random() < 0.5 ? "vertical" : "horizontal");
-  } while (!check);
-  do {
-    var check = placeShip(random(), random(), "human", 'd', Math.random() < 0.5 ? "vertical" : "horizontal");
-  } while (!check);
+  addPlacement();
+
+  // // temporary code to place human ships
+  // do {
+  //   var check = placeShip(random(), random(), "human", 'c', Math.random() < 0.5 ? "vertical" : "horizontal");
+  // } while (!check);
+  // do {
+  //   var check = placeShip(random(), random(), "human", 'b', Math.random() < 0.5 ? "vertical" : "horizontal");
+  // } while (!check);
+  // do {
+  //   var check = placeShip(random(), random(), "human", 'r', Math.random() < 0.5 ? "vertical" : "horizontal");
+  // } while (!check);
+  // do {
+  //   var check = placeShip(random(), random(), "human", 's', Math.random() < 0.5 ? "vertical" : "horizontal");
+  // } while (!check);
+  // do {
+  //   var check = placeShip(random(), random(), "human", 'd', Math.random() < 0.5 ? "vertical" : "horizontal");
+  // } while (!check);
+}
+
+function addPlacement () {
+  var cells = document.getElementsByTagName("td")
+  for (var i = 100; i < 200; i++) {
+    cells[i].addEventListener("click", placeHuman);
+  }
+}
+
+function placeHuman (target) {
+  var row = Number(target.currentTarget.getAttribute("data-row"));
+  var col = Number(target.currentTarget.getAttribute("data-col"));
+  // var ship = getElementById("ship-selector"); // future code
+  var shipTranslate = ['c', 'b', 'r', 's', 'd'];
+  // var orientation = orientationSelector ? "vertical" : "horizontal"; // future code
+  var orientation = "vertical"; // temp test
+  placeShip (row, col, "human", shipTranslate[shipsPlaced], orientation) ? shipsPlaced++ : false;
+  updateBoard();
+  if (shipsPlaced === 5) {
+    // start the game?
+    addTargeting();
+  } else addPlacement();
+
+}
+
+// place ship, return true if successful
+function placeShip (row, col, player, ship, orientation) {
+  var size = ships[player][ship];
+  // check for valid placement
+  for (var i = 0; i < size; i++) {
+    if (orientation === "vertical") {
+      if (row + size > 9 || boards[player][row + i][col] !== " ") return;
+    }
+    if (orientation === "horizontal") {
+      if (boards[player][row][col + i] !== " ") return;
+    }
+  }
+
+  // update board
+  for (var i = 0; i < size; i++) {
+    boards[player][row][col] = ship;
+    if (orientation === "vertical") row++;
+    if (orientation === "horizontal") col++;
+  }
+
+  return true;
 }
 
 function random () {
   return Math.floor(Math.random()*10);
-}
-
-function aiTarget () {
-  if (previousHits.length === 1) {
-    // check for valid adjacent cell
-    var row = previousHits[0][0];
-    var col = previousHits[0][1];
-    if (!(
-    testFire(row + 1, col, "human") ||
-    testFire(row - 1, col, "human") ||
-    testFire(row, col + 1, "human") ||
-    testFire(row, col - 1, "human"))) {
-      previousHits = [];
-      return aiTarget();
-    }
-    // choose adjacent cell
-    var direction = Math.floor(Math.random()*4);
-    if (direction === 0) {
-      var row = previousHits[0][0] + 1;
-      var col = previousHits[0][1];
-    } else if (direction === 1) {
-      var row = previousHits[0][0] - 1;
-      var col = previousHits[0][1];
-    } else if (direction === 2) {
-      var row = previousHits[0][0];
-      var col = previousHits[0][1] + 1;
-    } else if (direction === 3) {
-      var row = previousHits[0][0];
-      var col = previousHits[0][1] - 1;
-    }
-    // fire and return results
-    var result = fire(row, col, "human");
-    if (result === undefined) return aiTarget();
-    if (result === "hit") {
-      previousHits.push([row, col]);
-    } else if (result !== "miss") {
-      previousHits = [];
-    }
-    return result;
-
-  } else if (previousHits.length > 1) {
-    // continue firing in same direction, if possible
-    var prev = previousHits.length - 1;
-    var row = previousHits[prev][0] + previousHits[prev][0] - previousHits[prev - 1][0];
-    var col = previousHits[prev][1] + previousHits[prev][1] - previousHits[prev - 1][1];
-    if (testFire(row, col, "human")) {
-      var result = fire(row, col, "human");
-      if (result === "hit") {
-        previousHits.push([row, col]);
-      } else if (result !== "miss") {
-        previousHits = [];
-      }
-      return result;
-
-    } else {
-      // attempt firing in other direction
-      row = previousHits[0][0] + previousHits[0][0] - previousHits[1][0];
-      row = previousHits[0][1] + previousHits[0][1] - previousHits[1][1];
-      if (testFire(row, col, "human")) {
-        var result = fire(row, col, "human");
-        if (result === "hit") {
-          previousHits.push([row, col]);
-        } else if (result !== "miss") {
-          previousHits = [];
-        }
-        return result;
-      } else {
-        previousHits = [];
-        return aiTarget();
-      }
-    }
-  } else {
-    // random firing
-    var row = random();
-    var col = random();
-    var result = fire(row, col, "human");
-    if (result === undefined) return aiTarget();
-    if (result === "hit") {
-      previousHits.push([row, col]);
-    }
-    return result;
-  }
-}
-
-// aiTarget alternative - any hit pushes valid surrounding cells to targetList[]
-
-// human targeting
-function humanTarget () {
-
 }
 
 function testFire (row, col, player) {
@@ -218,7 +143,6 @@ function fire (row, col, player) {
   } else {
     var status = hit(player, boards[player][row][col]);
     boards[player][row][col] = 'x'
-    console.log(status);
     return status;
 
   }
@@ -228,8 +152,6 @@ function fire (row, col, player) {
 function hit (player, ship) {
   // update ship status, return ship type if sunk, players loses if game over
   ships[player][ship]--
-  console.log(player, ship, "hit, remaining squares:", ships[player][ship])
-  console.log(player, "total remaining squares:", ships[player].total())
   if (ships[player].total() === 0) return player + " loses";
   if (ships[player][ship] === 0) return ship;
   return "hit"
@@ -239,30 +161,71 @@ function hit (player, ship) {
 function runTurn (row, col) {
   // player inputs shot, update display, print result, computer shot, update display, print result
   var result = fire(row, col, "computer")
+  updateBoard();
   console.log(turns++);
-  // console.log(boards.human);
-  if (result === "computer loses") return result;
+  feedback (result, "Player")
+  if (result === "computer loses") {
+    gameOver();
+    return;
+  }
   var result = aiTarget();
-  if (result === "human loses") return result;
+  updateBoard();
+  feedback (result, "Computer")
+  if (result === "human loses") {
+    gameOver();
+    return;
+  }
+  addTargeting();
+}
+
+function feedback (result, player) {
+  if (result === "miss") logMessage(player + " misses");
+  if (result === "hit") logMessage(player + " hits!");
+  if (result === "c") logMessage(player + " sunk a carrier!");
+  if (result === "b") logMessage(player + " sunk a battleship!");
+  if (result === "r") logMessage(player + " sunk a cruiser!");
+  if (result === "s") logMessage(player + " sunk a submarine!");
+  if (result === "d") logMessage(player + " sunk a destroyer!");
+  if (/loses/.test(result)) logMessage(player + " wins!");
 }
 
 // run game
 function runGame () {
-  // set ship count
-  // setBoard etc
-  // DOMdisplay(document.body, "human");
-  gameOver(runTurn());
+  // need to reset ship tracking object
+  boards.computer = [
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+  ];
+  boards.human = [
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+  ];
+  setBoard();
 }
 
-function gameOver (winner) {
-  console.log(winner);
-  console.log(boards);
+function gameOver () {
+  // reset some shit
 }
 
-setBoard();
+var shipsPlaced = 0;
 var previousHits = [];
 var turns = 0;
-// runGame();
 
 
 
