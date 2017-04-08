@@ -7,10 +7,7 @@ function elt (name, className) {
 function DOMdisplay (parent, board, player) {
   this.wrap = parent.appendChild(elt("div"));
   this.board = board;
-
   this.wrap.appendChild(this.drawBoard(board, player));
-
-  // THERE IS SOME BULLSHIT HAPPENING IN HERE - HUMAN BOARD DRAWS THE COMPUTER BOARD
 }
 
 DOMdisplay.prototype.drawBoard = function (board, player) {
@@ -44,15 +41,23 @@ function addTargeting () {
   }
 }
 
-var scale = 30;
+var scale = 25;
 
-
+function newGameButton () {
+  var button = elt("button", "new-game-button");
+  button.value = "New game";
+  button.type = "button";
+  var parent = document.getElementById("interaction");
+  console.log(parent, button);
+  parent.appendChild(button);
+}
 
 window.onload = function() {
   var compContainer = document.getElementById("compBoard");
   var humanContainer = document.getElementById("humanBoard");
   var compBoard = new DOMdisplay(compContainer, boardTemplate, "computer");
   var humanBoard = new DOMdisplay(humanContainer, boardTemplate, "human");
+  newGameButton();
   runGame();
 
 }
@@ -62,11 +67,17 @@ function updateBoard () {
   var humanContainer = document.getElementById("humanBoard");
   compContainer.removeChild(compContainer.childNodes[0]);
   humanContainer.removeChild(humanContainer.childNodes[0]);
-  var compBoard = new DOMdisplay(document.getElementById("compBoard"), boards.computer, "computer");
-  var humanBoard = new DOMdisplay(document.getElementById("humanBoard"), boards.human, "human");
+  var compBoard = new DOMdisplay(compContainer, boards.computer, "computer");
+  var humanBoard = new DOMdisplay(humanContainer, boards.human, "human");
 }
 
 function logMessage (message) {
   // push something to text box
-  console.log(message);
+  var output = document.getElementById("message-box");
+  output.value += "\n" + turns + ": " + message;
+  output.scrollTop = output.scrollHeight;
+}
+
+function placementOptions () {
+
 }

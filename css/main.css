@@ -6,16 +6,28 @@ table {
 }
 td {
   border: 1px solid black;
+  background: url('../images/water.jpg');
+  background-size: 25px 25px;
 }
 td.x {
-  background: red;
+  background: url('../images/hit.jpg');
+  background-size: 25px 25px;
 }
 td.o {
-  background: white;
+  background: url('../images/miss.jpg');
+  background-size: 25px 25px;
 }
 td.c.human, td.b.human, td.r.human, td.s.human, td.d.human {
-  background: black;
+  background: url('../images/ship-tile.jpg');
+  background-size: 25px 25px;
 }
 h1, h2 {
   text-align: center;
+}
+
+#message-box {
+  display: block;
+  margin: 50px auto 0px;
+  resize: none;
+  overflow: auto;
 }
