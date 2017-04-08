@@ -28,7 +28,7 @@ function placeShip (row, col, player, ship, orientation) {
   // check for valid placement
   for (var i = 0; i < size; i++) {
     if (orientation === "vertical") {
-      if (row + size > 9 || boards[player][row + i][col] !== " ") return;
+      if (row + size > 10 || boards[player][row + i][col] !== " ") return;
     }
     if (orientation === "horizontal") {
       if (boards[player][row][col + i] !== " ") return;
@@ -67,13 +67,7 @@ function setBoard () {
   } while (!check);
 
   addPlacement();
-}
-
-function addPlacement () {
-  var cells = document.getElementsByTagName("td");
-  for (var i = 100; i < 200; i++) {
-    cells[i].addEventListener("click", placeHuman);
-  }
+  placementSelectors();
 }
 
 function placeHuman (target) {
@@ -81,13 +75,14 @@ function placeHuman (target) {
   var col = Number(target.currentTarget.getAttribute("data-col"));
   // var ship = getElementById("ship-selector"); // future code
   var shipTranslate = ['c', 'b', 'r', 's', 'd'];
-  var orientation = orientationSelector ? "vertical" : "horizontal";
-  // var orientation = "vertical"; // temp test
+  var orientation = document.querySelector('[name=orientation]:checked').value;
+  // var orientation = orientationSelector ? "vertical" : "horizontal";
   placeShip(row, col, "human", shipTranslate[shipsPlaced], orientation) ? shipsPlaced++ : false;
   updateBoard();
   if (shipsPlaced === 5) {
     addTargeting();
     logMessage("Fire when ready!");
+    removePlacementSelectors();
   } else addPlacement();
 }
 
@@ -155,7 +150,6 @@ function runTurn (row, col) {
 
 // run game
 function runGame () {
-  // need to reset ship tracking object
   ships.human = {
     c: 5,
     b: 4,
@@ -176,6 +170,8 @@ function runGame () {
       return this.c + this.b + this.r + this.s + this.d;
     }
   }
+  shipsPlaced = 0;
+  turns = 0;
   boards.computer = [
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
@@ -200,6 +196,10 @@ function runGame () {
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
   ];
+  var NGB = document.getElementsByTagName("button");
+  var interact = document.getElementById("interaction");
+  interact.removeChild(NGB[0]);
+  updateBoard();
   setBoard();
 }
 

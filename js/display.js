@@ -1,3 +1,5 @@
+var scale = 25;
+
 function elt (name, className) {
   var elt = document.createElement(name);
   if (className && className !== " ") elt.className = className;
@@ -26,11 +28,45 @@ DOMdisplay.prototype.drawBoard = function (board, player) {
   return table;
 }
 
-function aim (target) {
-  var row = Number(target.currentTarget.getAttribute("data-row"));
-  var col = Number(target.currentTarget.getAttribute("data-col"));
-  if (testFire(row, col, "computer")) {
-    runTurn(row, col);
+function newGameButton () {
+  var button = elt("button", "new-game-button");
+  button.type = "button";
+  button.innerHTML = "New game";
+  button.addEventListener("click", runGame);
+  var parent = document.getElementById("interaction");
+  parent.appendChild(button);
+}
+
+function placementSelectors () {
+  var vertical = elt("input", "orientation");
+  vertical.type = "radio";
+  vertical.name = "orientation";
+  vertical.innerHTML = "Vertical";
+  vertical.value = "vertical";
+  vertical.checked = true;
+  var horizontal = elt("input", "orientation");
+  horizontal.type = "radio";
+  horizontal.name = "orientation";
+  horizontal.innerHTML = "Horizontal";
+  horizontal.value = "horizontal";
+  var parent = document.getElementById("interaction");
+  parent.appendChild(vertical);
+  parent.appendChild(horizontal);
+
+}
+
+function removePlacementSelectors () {
+  var parent = document.getElementById("interaction");
+  var radios = document.getElementsByTagName("orientation");
+  for (var i = 0; i < radios.length; i++) {
+    parent.removeChild(radios[i]);
+  }
+}
+
+function addPlacement () {
+  var cells = document.getElementsByTagName("td");
+  for (var i = 100; i < 200; i++) {
+    cells[i].addEventListener("click", placeHuman);
   }
 }
 
@@ -41,15 +77,12 @@ function addTargeting () {
   }
 }
 
-var scale = 25;
-
-function newGameButton () {
-  var button = elt("button", "new-game-button");
-  button.value = "New game";
-  button.type = "button";
-  var parent = document.getElementById("interaction");
-  console.log(parent, button);
-  parent.appendChild(button);
+function aim (target) {
+  var row = Number(target.currentTarget.getAttribute("data-row"));
+  var col = Number(target.currentTarget.getAttribute("data-col"));
+  if (testFire(row, col, "computer")) {
+    runTurn(row, col);
+  }
 }
 
 window.onload = function() {
@@ -58,8 +91,6 @@ window.onload = function() {
   var compBoard = new DOMdisplay(compContainer, boardTemplate, "computer");
   var humanBoard = new DOMdisplay(humanContainer, boardTemplate, "human");
   newGameButton();
-  runGame();
-
 }
 
 function updateBoard () {
@@ -76,8 +107,4 @@ function logMessage (message) {
   var output = document.getElementById("message-box");
   output.value += "\n" + turns + ": " + message;
   output.scrollTop = output.scrollHeight;
-}
-
-function placementOptions () {
-
 }

@@ -31,3 +31,8 @@ h1, h2 {
   resize: none;
   overflow: auto;
 }
+
+button {
+  display: block;
+  margin: 10px auto 0px;
+}
