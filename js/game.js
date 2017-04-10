@@ -66,23 +66,31 @@ function setBoard () {
     var check = placeShip(random(), random(), "computer", 'd', Math.random() < 0.5 ? "vertical" : "horizontal");
   } while (!check);
 
+  var placement = document.getElementById('placement')
+  placement.style.display = 'block'
+  replaceShipSelectors();
   addPlacement();
-  placementSelectors();
 }
 
 function placeHuman (target) {
   var row = Number(target.currentTarget.getAttribute("data-row"));
   var col = Number(target.currentTarget.getAttribute("data-col"));
-  // var ship = getElementById("ship-selector"); // future code
-  var shipTranslate = ['c', 'b', 'r', 's', 'd'];
+  var ship = document.getElementById("ship");
   var orientation = document.querySelector('[name=orientation]:checked').value;
-  // var orientation = orientationSelector ? "vertical" : "horizontal";
-  placeShip(row, col, "human", shipTranslate[shipsPlaced], orientation) ? shipsPlaced++ : false;
+  if (placeShip(row, col, "human", ship.value, orientation)) {
+    shipsPlaced++;
+    // remove ship from select
+    var shipSelector = document.getElementById("ship");
+    for (var i = 0; i < shipSelector.length; i++) {
+      if (shipSelector.options[i].value === ship.value) shipSelector.remove(i);
+    }
+  }
   updateBoard();
   if (shipsPlaced === 5) {
     addTargeting();
+    var placement = document.getElementById('placement')
+    placement.style.display = 'none'
     logMessage("Fire when ready!");
-    removePlacementSelectors();
   } else addPlacement();
 }
 
@@ -91,15 +99,15 @@ function testFire (row, col, player) {
   return true;
 }
 
+// update ship status, return ship type if sunk, players loses if game over
 function hit (player, ship) {
-  // update ship status, return ship type if sunk, players loses if game over
   ships[player][ship]--;
   if (ships[player].total() === 0) return player + " loses";
   if (ships[player][ship] === 0) return ship;
   return "hit";
 }
 
-// take shot with coords and
+// take shot with coords and player
 function fire (row, col, player) {
   if (row > 9 || row < 0 || col > 9 || col < 0 || boards[player][row][col] === 'x' || boards[player][row][col] === 'o') return;
   if (boards[player][row][col] === ' ') {
@@ -113,6 +121,7 @@ function fire (row, col, player) {
   }
 }
 
+// this could be turned into an object eg feedback.human.miss = "Human misses"
 function feedback (result, player) {
   if (result === "miss") logMessage(player + " misses");
   if (result === "hit") logMessage(player + " hits!");
@@ -128,8 +137,8 @@ function gameOver () {
   newGameButton();
 }
 
+// takes coords from click event, fires, runs AI targeting, and prints results
 function runTurn (row, col) {
-  // player inputs shot, update display, print result, computer shot, update display, print result
   var result = fire(row, col, "computer");
   updateBoard();
   console.log(turns++);
@@ -202,11 +211,3 @@ function runGame () {
   updateBoard();
   setBoard();
 }
-
-
-
-
-
-
-
-//stretch: add variations

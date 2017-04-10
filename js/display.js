@@ -37,32 +37,23 @@ function newGameButton () {
   parent.appendChild(button);
 }
 
-function placementSelectors () {
-  var vertical = elt("input", "orientation");
-  vertical.type = "radio";
-  vertical.name = "orientation";
-  vertical.innerHTML = "Vertical";
-  vertical.value = "vertical";
-  vertical.checked = true;
-  var horizontal = elt("input", "orientation");
-  horizontal.type = "radio";
-  horizontal.name = "orientation";
-  horizontal.innerHTML = "Horizontal";
-  horizontal.value = "horizontal";
-  var parent = document.getElementById("interaction");
-  parent.appendChild(vertical);
-  parent.appendChild(horizontal);
-
+function addShipOptions (value, text) {
+  var select = document.getElementById("ship");
+  var option = document.createElement("option");
+  option.text = text;
+  option.value = value;
+  select.add(option);
 }
 
-function removePlacementSelectors () {
-  var parent = document.getElementById("interaction");
-  var radios = document.getElementsByTagName("orientation");
-  for (var i = 0; i < radios.length; i++) {
-    parent.removeChild(radios[i]);
-  }
+function replaceShipSelectors () {
+  addShipOptions('c', 'Carrier');
+  addShipOptions('b', 'Battleship');
+  addShipOptions('r', 'Cruiser');
+  addShipOptions('s', 'Submarine');
+  addShipOptions('d', 'Destroyer');
 }
 
+// attach event listeners for placing ships
 function addPlacement () {
   var cells = document.getElementsByTagName("td");
   for (var i = 100; i < 200; i++) {
@@ -70,6 +61,7 @@ function addPlacement () {
   }
 }
 
+// attach event listeners for targeting
 function addTargeting () {
   var cells = document.getElementsByTagName("td")
   for (var i = 0; i < 100; i++) {
@@ -102,8 +94,8 @@ function updateBoard () {
   var humanBoard = new DOMdisplay(humanContainer, boards.human, "human");
 }
 
+// push something to text box
 function logMessage (message) {
-  // push something to text box
   var output = document.getElementById("message-box");
   output.value += "\n" + turns + ": " + message;
   output.scrollTop = output.scrollHeight;
